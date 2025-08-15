@@ -1,0 +1,84 @@
+{
+  "errors": {
+    "appointment": {
+      "not_found": "Cita no encontrada",
+      "date_required": "La fecha es obligatoria",
+      "date_invalid": "Formato de fecha inválido",
+      "start_time_required": "La hora de inicio es obligatoria",
+      "start_time_invalid": "Formato de hora de inicio inválido",
+      "end_time_required": "La hora de fin es obligatoria",
+      "end_time_invalid": "Formato de hora de fin inválido",
+      "duration_required": "La duración es obligatoria",
+      "duration_invalid": "Duración inválida",
+      "price_required": "El precio es obligatorio",
+      "price_invalid": "Precio inválido",
+      "company_required": "La empresa es obligatoria",
+      "company_invalid": "Empresa inválida",
+      "employee_required": "El profesional es obligatorio",
+      "employee_invalid": "Profesional inválido",
+      "customer_required": "El cliente es obligatorio",
+      "customer_invalid": "Cliente inválido",
+      "service_required": "El servicio es obligatorio",
+      "service_invalid": "Servicio inválido"
+    },
+    "customer": {
+      "not_found": "Cliente no encontrado",
+      "name_required": "El nombre es obligatorio",
+      "name_invalid": "Nombre inválido",
+      "email_required": "El correo electrónico es obligatorio",
+      "email_invalid": "Formato de correo electrónico inválido",
+      "document_required": "El documento es obligatorio",
+      "document_invalid": "Formato de documento inválido",
+      "phone_invalid": "Formato de teléfono inválido",
+      "company_required": "La empresa es obligatoria",
+      "company_invalid": "Empresa inválida"
+    },
+    "user": {
+      "not_found": "Usuario no encontrado",
+      "not_found_by_email": "Usuario con este correo electrónico no encontrado.",
+      "name_required": "El nombre es obligatorio",
+      "name_invalid": "Nombre inválido",
+      "email_required": "El correo electrónico es obligatorio",
+      "email_invalid": "Formato de correo electrónico inválido",
+      "password_required": "La contraseña es obligatoria",
+      "password_invalid": "La contraseña debe tener al menos 6 caracteres",
+      "email_already_exists": "Este correo electrónico ya está en uso.",
+      "invalid_referral_code": "El código de referencia es inválido."
+    },
+    "auth": {
+      "invalid_credentials": "Correo electrónico o contraseña inválidos.",
+      "no_active_company": "No hay empresa activa asociada a su cuenta.",
+      "unauthorized": "Acceso no autorizado",
+      "token_expired": "Token expirado",
+      "token_invalid": "Token inválido"
+    }
+  },
+  "messages": {
+    "appointment": {
+      "created": "Cita creada con éxito",
+      "updated": "Cita actualizada con éxito",
+      "deleted": "Cita eliminada con éxito"
+    },
+    "customer": {
+      "created": "Cliente creado con éxito",
+      "updated": "Cliente actualizado con éxito",
+      "deleted": "Cliente eliminado con éxito"
+    },
+    "user": {
+      "created": "Usuario creado con éxito",
+      "updated": "Usuario actualizado con éxito",
+      "deleted": "Usuario eliminado con éxito"
+    },
+    "auth": {
+      "login_success": "Inicio de sesión exitoso",
+      "logout_success": "Cierre de sesión exitoso",
+      "password_changed": "Contraseña cambiada con éxito",
+      "register.success": "Usuario registrado con éxito. Verifique su correo electrónico para activar su cuenta."
+    }
+  },
+  "auth": {
+    "request_password_reset_success": "Si su correo electrónico está registrado y verificado, recibirá un token para restablecer su contraseña pronto.",
+    "reset_password_success": "Su contraseña ha sido restablecida con éxito.",
+    "change_password_success": "Su contraseña ha sido cambiada con éxito."
+  }
+}

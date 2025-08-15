@@ -1,0 +1,234 @@
+{
+  "errors": {
+    "appointment": {
+      "not_found": "Appointment not found",
+      "date_required": "Date is required",
+      "date_invalid": "Invalid date format",
+      "start_time_required": "Start time is required",
+      "start_time_invalid": "Invalid start time format",
+      "end_time_required": "End time is required",
+      "end_time_invalid": "Invalid end time format",
+      "duration_required": "Duration is required",
+      "duration_invalid": "Invalid duration",
+      "price_required": "Price is required",
+      "price_invalid": "Invalid price",
+      "company_required": "Company is required",
+      "company_invalid": "Invalid company",
+      "employee_required": "Professional is required",
+      "employee_invalid": "Invalid professional",
+      "customer_required": "Customer is required",
+      "customer_invalid": "Invalid customer",
+      "service_required": "Service is required",
+      "service_invalid": "Invalid service"
+    },
+    "customer": {
+      "not_found": "Customer not found",
+      "name_required": "Name is required",
+      "name_invalid": "Invalid name",
+      "email_required": "Email is required",
+      "email_invalid": "Invalid email format",
+      "document_required": "Document is required",
+      "document_invalid": "Invalid document format",
+      "phone_invalid": "Invalid phone format",
+      "company_required": "Company is required",
+      "company_invalid": "Invalid company"
+    },
+    "role": {
+      "not_found": "Role not found",
+      "name_required": "Role name is required",
+      "name_invalid": "Invalid role name",
+      "description_invalid": "Invalid description",
+      "company_required": "Company is required",
+      "company_invalid": "Invalid company"
+    },
+    "notification": {
+      "not_found": "Notification not found",
+      "type_required": "Type is required",
+      "type_invalid": "Invalid type",
+      "title_required": "Title is required",
+      "title_invalid": "Invalid title",
+      "message_required": "Message is required",
+      "message_invalid": "Invalid message",
+      "recipient_required": "Recipient is required",
+      "recipient_invalid": "Invalid recipient"
+    },
+    "company": {
+      "not_found": "Company not found",
+      "name_required": "Company name is required",
+      "name_invalid": "Invalid company name",
+      "document_required": "Document is required",
+      "document_invalid": "Invalid document format",
+      "email_required": "Email is required",
+      "email_invalid": "Invalid email format",
+      "phone_invalid": "Invalid phone format",
+      "address_invalid": "Invalid address",
+      "user_not_in_company": "User does not belong to this company.",
+      "user_already_in_company": "User is already associated with this company."
+    },
+    "user": {
+      "not_found": "User not found",
+      "not_found_by_email": "User with this email not found.",
+      "name_required": "Name is required",
+      "name_invalid": "Invalid name",
+      "email_required": "Email is required",
+      "email_invalid": "Invalid email format",
+      "password_required": "Password is required",
+      "password_invalid": "Password must have at least 6 characters",
+      "document_invalid": "Invalid document format",
+      "phone_invalid": "Invalid phone format",
+      "role_required": "Role is required",
+      "role_invalid": "Invalid role",
+      "invalid_role": "The specified role is invalid.",
+      "company_required": "Company is required",
+      "company_invalid": "Invalid company",
+      "not_found_in_business": "User not found in business",
+      "cannot_change_own_role": "Cannot change own role",
+      "no_business_access": "User has no access to this business",
+      "email_already_exists": "This email is already in use.",
+      "invalid_referral_code": "The referral code is invalid."
+    },
+    "service": {
+      "not_found": "Service not found",
+      "name_required": "Service name is required",
+      "name_invalid": "Invalid service name",
+      "description_invalid": "Invalid service description",
+      "duration_required": "Service duration is required",
+      "duration_invalid": "Invalid service duration",
+      "price_required": "Service price is required",
+      "price_invalid": "Invalid service price",
+      "company_required": "Company is required",
+      "company_invalid": "Invalid company"
+    },
+    "auth": {
+      "invalid_credentials": "Invalid email or password.",
+      "no_active_company": "No active company is associated with your account.",
+      "company_access_denied": "You don't have permission to access this company.",
+      "switch_company_failed": "Failed to switch company. Please try again later.",
+      "unauthorized": "Unauthorized access",
+      "token_expired": "Token expired",
+      "token_invalid": "Invalid token",
+      "current_password_required": "Current password is required",
+      "current_password_invalid": "Invalid current password",
+      "new_password_required": "New password is required",
+      "new_password_invalid": "New password must have at least 6 characters",
+      "passwords_match": "New password must be different from current password",
+      "email_not_verified_for_reset": "Email not verified. Please verify your email before requesting password reset.",
+      "password_reset.invalid_token": "Invalid or incorrect password reset token.",
+      "password_reset.expired_token": "Password reset token has expired. Please request a new one.",
+      "device_not_found": "Device not found",
+      "email_already_verified": "Email already verified",
+      "expired_verification_code": "Verification code expired",
+      "invalid_or_expired_token": "Invalid or expired token",
+      "invalid_verification_code": "Invalid verification code",
+      "missing_current_device": "Current device not found"
+    },
+    "business": {
+      "already_exists": "Business already exists",
+      "no_access": "No access to business",
+      "not_found": "Business not found",
+      "not_found_for_user": "Business not found for user"
+    },
+    "credits": {
+      "cannot_cancel_depleted": "Cannot cancel a depleted credit.",
+      "insufficient_balance": "Insufficient credit balance for this operation.",
+      "not_found": "Credit not found."
+    }
+  },
+  "messages": {
+    "appointment": {
+      "created": "Appointment created successfully",
+      "updated": "Appointment updated successfully",
+      "deleted": "Appointment deleted successfully",
+      "cancelled": "Appointment cancelled successfully"
+    },
+    "customer": {
+      "created": "Customer created successfully",
+      "updated": "Customer updated successfully",
+      "deleted": "Customer deleted successfully"
+    },
+    "role": {
+      "created": "Role created successfully",
+      "updated": "Role updated successfully",
+      "deleted": "Role deleted successfully"
+    },
+    "notification": {
+      "created": "Notification created successfully",
+      "updated": "Notification updated successfully",
+      "deleted": "Notification deleted successfully",
+      "read": "Notification marked as read",
+      "all_read": "All notifications marked as read"
+    },
+    "company": {
+      "created": "Company created successfully",
+      "updated": "Company updated successfully",
+      "deleted": "Company deleted successfully"
+    },
+    "user": {
+      "created": "User created successfully",
+      "updated": "User updated successfully",
+      "deleted": "User deleted successfully",
+      "password_changed": "Password changed successfully"
+    },
+    "employee": {
+      "created": "Professional created successfully",
+      "updated": "Professional updated successfully",
+      "deleted": "Professional deleted successfully"
+    },
+    "service": {
+      "created": "Service created successfully",
+      "updated": "Service updated successfully",
+      "deleted": "Service deleted successfully"
+    },
+    "auth": {
+      "login_success": "Login successful",
+      "logout_success": "Logout successful",
+      "password_changed": "Password changed successfully",
+      "token_refreshed": "Token refreshed successfully",
+      "request_password_reset_success": "If your email is registered and verified, you will receive a password reset token shortly.",
+      "reset_password_success": "Your password has been reset successfully.",
+      "change_password_success": "Your password has been changed successfully. You may need to log in again on other devices.",
+      "email_verification.success": "Email verified successfully",
+      "forgot_password.success": "Password reset request sent",
+      "register.success": "User registered successfully. Check your email to activate your account.",
+      "resend_verification.success": "Verification email resent",
+      "default_business_set": "Default business set successfully."
+    },
+    "businesses": {
+      "create.success": "Business created successfully",
+      "remove.success": "Business removed successfully",
+      "update.success": "Business updated successfully",
+      "update_user_role.success": "User role updated successfully"
+    },
+    "users": {
+      "preferences": {
+        "updated_success": "Preferences updated successfully",
+        "retrieved_success": "Preferences retrieved successfully"
+      }
+    },
+    "credits": {
+      "grant_success": "Credit granted successfully.",
+      "redeem_success": "Credit redeemed successfully.",
+      "cancel_success": "Credit cancelled successfully."
+    }
+  },
+  "auth": {
+    "devices": {
+      "revoked_all_devices": "Session terminated on all devices.",
+      "revoked_device": "Device session terminated."
+    },
+    "login": {
+      "emailNotVerified": "Your email has not been verified yet. Please check your inbox.",
+      "noBusinessAccounts": "No business found for this user."
+    },
+    "setDefaultBusiness": {
+      "notMemberOrNotAccepted": "User is not a member or has not accepted the invitation to this business.",
+      "businessDeleted": "The selected business has been deactivated or removed."
+    },
+    "business_session": {
+      "default_updated_success": "Default business updated successfully."
+    },
+    "request_password_reset_success": "If your email is registered and verified, you will receive a password reset token shortly.",
+    "reset_password_success": "Your password has been reset successfully.",
+    "change_password_success": "Your password has been changed successfully."
+  }
+}

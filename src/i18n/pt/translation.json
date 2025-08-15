@@ -1,0 +1,353 @@
+{
+  "errors": {
+    "appointment": {
+      "not_found": "Agendamento não encontrado",
+      "date_required": "Data é obrigatória",
+      "date_invalid": "Formato de data inválido",
+      "start_time_required": "Horário de início é obrigatório",
+      "start_time_invalid": "Formato de horário de início inválido",
+      "end_time_required": "Horário de término é obrigatório",
+      "end_time_invalid": "Formato de horário de término inválido",
+      "duration_required": "Duração é obrigatória",
+      "duration_invalid": "Duração inválida",
+      "price_required": "Preço é obrigatório",
+      "price_invalid": "Preço inválido",
+      "company_required": "Empresa é obrigatória",
+      "company_invalid": "Empresa inválida",
+      "employee_required": "Profissional é obrigatório",
+      "employee_invalid": "Profissional inválido",
+      "customer_required": "Cliente é obrigatório",
+      "customer_invalid": "Cliente inválido",
+      "service_required": "Serviço é obrigatório",
+      "service_invalid": "Serviço inválido"
+    },
+    "customer": {
+      "not_found": "Cliente não encontrado",
+      "name_required": "Nome é obrigatório",
+      "name_invalid": "Nome inválido",
+      "email_required": "E-mail é obrigatório",
+      "email_invalid": "Formato de e-mail inválido",
+      "document_required": "Documento é obrigatório",
+      "document_invalid": "Formato de documento inválido",
+      "phone_invalid": "Formato de telefone inválido",
+      "company_required": "Empresa é obrigatória",
+      "company_invalid": "Empresa inválida"
+    },
+    "role": {
+      "not_found": "Cargo não encontrado",
+      "name_required": "Nome do cargo é obrigatório",
+      "name_invalid": "Nome do cargo inválido",
+      "description_invalid": "Descrição inválida",
+      "company_required": "Empresa é obrigatória",
+      "company_invalid": "Empresa inválida"
+    },
+    "notification": {
+      "not_found": "Notificação não encontrada",
+      "type_required": "Tipo é obrigatório",
+      "type_invalid": "Tipo inválido",
+      "title_required": "Título é obrigatório",
+      "title_invalid": "Título inválido",
+      "message_required": "Mensagem é obrigatória",
+      "message_invalid": "Mensagem inválida",
+      "recipient_required": "Destinatário é obrigatório",
+      "recipient_invalid": "Destinatário inválido"
+    },
+    "company": {
+      "not_found": "Empresa não encontrada",
+      "name_required": "Nome da empresa é obrigatório",
+      "name_invalid": "Nome da empresa inválido",
+      "document_required": "Documento é obrigatório",
+      "document_invalid": "Formato de documento inválido",
+      "email_required": "E-mail é obrigatório",
+      "email_invalid": "Formato de e-mail inválido",
+      "phone_invalid": "Formato de telefone inválido",
+      "address_invalid": "Endereço inválido",
+      "user_not_in_company": "Usuário não pertence a esta empresa.",
+      "user_already_in_company": "Usuário já está associado a esta empresa."
+    },
+    "user": {
+      "not_found": "Usuário não encontrado",
+      "not_found_by_email": "Usuário com este e-mail não encontrado.",
+      "name_required": "Nome é obrigatório",
+      "name_invalid": "Nome inválido",
+      "email_required": "E-mail é obrigatório",
+      "email_invalid": "Formato de e-mail inválido",
+      "password_required": "Senha é obrigatória",
+      "password_invalid": "Senha deve ter no mínimo 6 caracteres",
+      "document_invalid": "Formato de documento inválido",
+      "phone_invalid": "Formato de telefone inválido",
+      "role_required": "Cargo é obrigatório",
+      "role_invalid": "Cargo inválido",
+      "invalid_role": "O cargo especificado é inválido.",
+      "company_required": "Empresa é obrigatória",
+      "company_invalid": "Empresa inválida",
+      "not_found_in_business": "Usuário não encontrado na empresa",
+      "cannot_change_own_role": "Não é possível alterar o próprio cargo",
+      "no_business_access": "Usuário não tem acesso a esta empresa",
+      "email_already_exists": "Este e-mail já está em uso.",
+      "invalid_referral_code": "O código de indicação é inválido."
+    },
+    "service": {
+      "not_found": "Serviço não encontrado",
+      "name_required": "Nome do serviço é obrigatório",
+      "name_invalid": "Nome do serviço inválido",
+      "description_invalid": "Descrição do serviço inválida",
+      "duration_required": "Duração do serviço é obrigatória",
+      "duration_invalid": "Duração do serviço inválida",
+      "price_required": "Preço do serviço é obrigatório",
+      "price_invalid": "Preço do serviço inválido",
+      "company_required": "Empresa é obrigatória",
+      "company_invalid": "Empresa inválida"
+    },
+    "profile": {
+      "not_found": "Perfil não encontrado",
+      "name_required": "Nome do perfil é obrigatório",
+      "name_invalid": "Nome do perfil inválido",
+      "description_invalid": "Descrição inválida",
+      "company_required": "Empresa é obrigatória",
+      "company_invalid": "Empresa inválida"
+    },
+    "color": {
+      "not_found": "Cor não encontrada",
+      "name_required": "Nome da cor é obrigatório",
+      "name_invalid": "Nome da cor inválido",
+      "hex_required": "Código hexadecimal é obrigatório",
+      "hex_invalid": "Código hexadecimal inválido",
+      "company_required": "Empresa é obrigatória",
+      "company_invalid": "Empresa inválida"
+    },
+    "auth": {
+      "invalid_credentials": "E-mail ou senha inválidos.",
+      "no_active_company": "Nenhuma empresa ativa está associada à sua conta.",
+      "company_access_denied": "Você não tem permissão para acessar esta empresa.",
+      "switch_company_failed": "Falha ao trocar de empresa. Por favor, tente novamente mais tarde.",
+      "unauthorized": "Acesso não autorizado",
+      "token_expired": "Token expirado",
+      "token_invalid": "Token inválido",
+      "current_password_required": "Senha atual é obrigatória",
+      "current_password_invalid": "Senha atual inválida",
+      "new_password_required": "Nova senha é obrigatória",
+      "new_password_invalid": "Nova senha deve ter no mínimo 6 caracteres",
+      "passwords_match": "Nova senha deve ser diferente da senha atual",
+      "email_not_verified_for_reset": "E-mail não verificado. Por favor, verifique seu e-mail antes de solicitar a redefinição de senha.",
+      "password_reset.invalid_token": "Token de redefinição de senha inválido ou incorreto.",
+      "password_reset.expired_token": "O token para redefinição de senha expirou. Por favor, solicite um novo.",
+      "device_not_found": "Dispositivo não encontrado",
+      "email_already_verified": "E-mail já verificado",
+      "expired_verification_code": "Código de verificação expirado",
+      "invalid_or_expired_token": "Token inválido ou expirado",
+      "invalid_verification_code": "Código de verificação inválido",
+      "missing_current_device": "Dispositivo atual não encontrado"
+    },
+    "business": {
+      "already_exists": "Empresa já existe",
+      "no_access": "Sem acesso à empresa",
+      "not_found": "Empresa não encontrada",
+      "not_found_for_user": "Empresa não encontrada para o usuário"
+    },
+    "commission": {
+      "already_exists": "Comissão já existe para este funcionário",
+      "not_found": "Comissão não encontrada",
+      "not_set_for_professional": "Comissão não configurada para este profissional",
+      "payment_not_found": "Pagamento de comissão não encontrado"
+    },
+    "customer_note": {
+      "not_found": "Apontamento do cliente não encontrado"
+    },
+    "employee": {
+      "already_exists_in_business": "Funcionário já existe nesta empresa",
+      "not_found_in_business": "Funcionário não encontrado na empresa"
+    },
+    "anamnese": {
+      "form_not_found": "Formulário de anamnese não encontrado"
+    },
+    "page_bio": {
+      "slug_in_use": "Slug já está em uso"
+    },
+    "services": {
+      "not_found": "Serviço não encontrado",
+      "invalid_referral_code": "O código de indicação é inválido."
+    },
+    "validation": {
+      "users": {
+        "already_exists": "Usuário já existe",
+        "email_already_exists": "Este e-mail já está sendo usado",
+        "not_found": "Usuário não encontrado",
+        "invalid_referral_code": "O código de referência informado é inválido."
+      }
+    },
+    "credits": {
+      "cannot_cancel_depleted": "Não é possível cancelar um crédito já utilizado.",
+      "insufficient_balance": "Saldo de crédito insuficiente para esta operação.",
+      "not_found": "Crédito não encontrado."
+    }
+  },
+  "messages": {
+    "customer_note": {
+      "deleted": "Nota do cliente excluída com sucesso"
+    },
+    "appointment": {
+      "created": "Agendamento criado com sucesso",
+      "updated": "Agendamento atualizado com sucesso",
+      "deleted": "Agendamento excluído com sucesso",
+      "cancelled": "Agendamento cancelado com sucesso"
+    },
+    "customer": {
+      "created": "Cliente criado com sucesso",
+      "updated": "Cliente atualizado com sucesso",
+      "deleted": "Cliente excluído com sucesso"
+    },
+    "role": {
+      "created": "Cargo criado com sucesso",
+      "updated": "Cargo atualizado com sucesso",
+      "deleted": "Cargo excluído com sucesso"
+    },
+    "notification": {
+      "created": "Notificação criada com sucesso",
+      "updated": "Notificação atualizada com sucesso",
+      "deleted": "Notificação excluída com sucesso",
+      "read": "Notificação marcada como lida",
+      "all_read": "Todas as notificações marcadas como lidas"
+    },
+    "company": {
+      "created": "Empresa criada com sucesso",
+      "updated": "Empresa atualizada com sucesso",
+      "deleted": "Empresa excluída com sucesso"
+    },
+    "user": {
+      "created": "Usuário criado com sucesso",
+      "updated": "Usuário atualizado com sucesso",
+      "deleted": "Usuário excluído com sucesso",
+      "password_changed": "Senha alterada com sucesso"
+    },
+    "employee": {
+      "created": "Profissional criado com sucesso",
+      "updated": "Profissional atualizado com sucesso",
+      "deleted": "Profissional excluído com sucesso"
+    },
+    "service": {
+      "created": "Serviço criado com sucesso",
+      "updated": "Serviço atualizado com sucesso",
+      "deleted": "Serviço excluído com sucesso"
+    },
+    "profile": {
+      "created": "Perfil criado com sucesso",
+      "updated": "Perfil atualizado com sucesso",
+      "deleted": "Perfil excluído com sucesso"
+    },
+    "color": {
+      "created": "Cor criada com sucesso",
+      "updated": "Cor atualizada com sucesso",
+      "deleted": "Cor excluída com sucesso"
+    },
+    "auth": {
+      "login_success": "Login realizado com sucesso",
+      "logout_success": "Logout realizado com sucesso",
+      "password_changed": "Senha alterada com sucesso",
+      "token_refreshed": "Token atualizado com sucesso",
+      "request_password_reset_success": "Se o seu e-mail estiver cadastrado e verificado, você receberá um token para redefinição de senha em breve.",
+      "reset_password_success": "Sua senha foi redefinida com sucesso.",
+      "change_password_success": "Sua senha foi alterada com sucesso. Pode ser necessário fazer login novamente em outros dispositivos.",
+      "email_verification.success": "E-mail verificado com sucesso",
+      "forgot_password.success": "Solicitação de redefinição de senha enviada",
+      "register.success": "Usuário registrado com sucesso. Verifique seu e-mail para ativar sua conta.",
+      "resend_verification.success": "E-mail de verificação reenviado",
+      "default_business_set": "Negócio padrão definido com sucesso."
+    },
+    "companies": {
+      "invite.success": "Convite enviado ao usuário com sucesso.",
+      "list_users.success": "Usuários da empresa listados com sucesso.",
+      "update_user_role.success": "O cargo do usuário foi atualizado com sucesso.",
+      "remove_user.success": "Usuário removido da empresa com sucesso."
+    },
+    "admin": {
+      "account.profile_updated_success": "Perfil atualizado com sucesso",
+      "documents.removed_success": "Documento removido com sucesso",
+      "influencers.removed_success": "Influenciador removido com sucesso",
+      "users.deactivated_success": "Usuário desativado com sucesso"
+    },
+    "anamnese": {
+      "form.deactivated_success": "Formulário de anamnese desativado com sucesso"
+    },
+    "businesses": {
+      "create.success": "Empresa criada com sucesso",
+      "remove.success": "Empresa removida com sucesso",
+      "update.success": "Empresa atualizada com sucesso",
+      "update_user_role.success": "Cargo do usuário atualizado com sucesso"
+    },
+    "commissions": {
+      "create_success": "Comissão criada com sucesso",
+      "delete_success": "Comissão excluída com sucesso",
+      "payment_deleted_success": "Pagamento de comissão excluído com sucesso",
+      "payment_registered_success": "Pagamento de comissão registrado com sucesso",
+      "payment_updated_success": "Pagamento de comissão atualizado com sucesso",
+      "update_success": "Comissão atualizada com sucesso"
+    },
+    "employees": {
+      "invite_sent_success": "Convite enviado com sucesso",
+      "invite_success": "Funcionário convidado com sucesso"
+    },
+    "services": {
+      "create.success": "Serviço criado com sucesso",
+      "find_one.success": "Serviço encontrado com sucesso",
+      "remove.success": "Serviço removido com sucesso",
+      "update.success": "Serviço atualizado com sucesso"
+    },
+    "users": {
+      "create_professional.success": "Profissional criado com sucesso",
+      "find_all.success": "Usuários listados com sucesso",
+      "find_one.success": "Usuário encontrado com sucesso",
+      "find_one_professional.success": "Profissional encontrado com sucesso",
+      "remove.success": "Usuário removido com sucesso",
+      "remove_professional.success": "Profissional removido com sucesso",
+      "update.success": "Usuário atualizado com sucesso",
+      "update_professional.success": "Profissional atualizado com sucesso",
+      "preferences": {
+        "updated_success": "Preferências atualizadas com sucesso",
+        "retrieved_success": "Preferências obtidas com sucesso"
+      },
+      "change_password.success": "Senha alterada com sucesso."
+    },
+    "credits": {
+      "grant_success": "Crédito concedido com sucesso.",
+      "redeem_success": "Crédito resgatado com sucesso.",
+      "cancel_success": "Crédito cancelado com sucesso."
+    },
+    "invitations": {
+      "sent_successfully": "Convite enviado com sucesso.",
+      "responded_successfully": "Resposta ao convite processada com sucesso."
+    }
+  },
+  "auth": {
+    "devices": {
+      "revoked_all_devices": "Sessão encerrada em todos os dispositivos.",
+      "revoked_device": "Sessão do dispositivo encerrada."
+    },
+    "login": {
+      "emailNotVerified": "Seu e-mail ainda não foi verificado. Por favor, verifique sua caixa de entrada.",
+      "noBusinessAccounts": "Nenhuma empresa encontrada para este usuário."
+    },
+    "setDefaultBusiness": {
+      "notMemberOrNotAccepted": "Usuário não é membro ou não aceitou o convite para esta empresa.",
+      "businessDeleted": "A empresa selecionada foi desativada ou removida."
+    },
+    "business_session": {
+      "default_updated_success": "Empresa padrão atualizada com sucesso."
+    },
+    "switchBusiness": {
+      "notMember": "Usuário não é membro da empresa para a qual está tentando trocar."
+    }
+  },
+  "admin": {
+    "documents": {
+      "not_found": "Documento não encontrado.",
+      "type_exists": "Já existe um documento com este tipo."
+    },
+    "influencers": {
+      "already_an_influencer": "Este usuário já é um influenciador.",
+      "commission_not_found": "Comissão não encontrada.",
+      "not_found": "Influenciador não encontrado.",
+      "user_not_found": "Usuário não encontrado."
+    }
+  }
+}

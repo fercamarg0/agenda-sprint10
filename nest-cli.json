@@ -1,0 +1,13 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "src",
+  "compilerOptions": {
+    "tsConfigPath": "tsconfig.json",
+    "assets": ["prisma/**/*", "i18n/**/*"],
+    "watchAssets": true,
+    "webpack": false,
+    "builder": "swc",
+
+    "plugins": []
+  }
+}

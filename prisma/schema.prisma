@@ -1,0 +1,1310 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum SystemRole {
+  SUPER_ADMIN
+  USER
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String             @id @default(uuid()) @db.Uuid
+  systemRole        SystemRole         @default(USER)
+  email             String             @unique
+  password          String
+  emailVerifiedAt   DateTime?          @db.Timestamp(6)
+  profile           Profile?
+  emailVerification EmailVerification?
+  passwordResets    PasswordReset[]
+  preferences       UserPreferences?
+  influencerProfile Influencer?
+  userBusinesses    UserBusiness[]
+  devices           UserDevice[]
+  madeReferrals     Referral[]         @relation("UserMadeReferrals")
+  wasReferredBy     Referral?          @relation("UserWasReferred")
+  tokensRevokedAt   DateTime?
+  createdAt         DateTime           @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime           @updatedAt
+  deletedAt         DateTime?
+  auditLogs         AuditLog[]
+  reminders         ReminderItem[]
+  reminderLists     ReminderList[]
+
+  @@index([email])
+  @@index([emailVerifiedAt])
+}
+
+model UserDevice {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @db.Uuid
+  refreshToken String?  @unique
+  ipAddress    String
+  userAgent    String   @db.Text
+  country      String?
+  city         String?
+  region       String?
+  lastUsedAt   DateTime @updatedAt
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, userAgent])
+  @@index([userId])
+}
+
+model Plan {
+  id              String         @id @default(uuid()) @db.Uuid
+  name            String
+  version         Int            @default(1)
+  description     String?
+  price           Decimal        @db.Decimal(10, 2)
+  currency        String         @default("BRL")
+  active          Boolean        @default(true)
+  appleProductId  String?        @unique
+  googleProductId String?        @unique
+  stripePriceId   String?        @unique
+  features        String[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  subscriptions   Subscription[]
+
+  @@unique([name, version])
+}
+
+enum SubscriptionProvider {
+  APPLE
+  GOOGLE
+  STRIPE
+  SYSTEM
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  TRIAL
+  PAST_DUE
+  GRACE_PERIOD
+  EXPIRED
+}
+
+model Subscription {
+  id                     String               @id @default(uuid()) @db.Uuid
+  businessId             String               @unique @db.Uuid
+  planId                 String               @db.Uuid
+  provider               SubscriptionProvider
+  status                 SubscriptionStatus
+  startDate              DateTime
+  endDate                DateTime
+  trialEndsAt            DateTime?
+  canceledAt             DateTime?
+  currentPeriodStart     DateTime
+  currentPeriodEnd       DateTime
+  providerSubscriptionId String?
+  providerCustomerId     String?
+  providerData           Json?
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  business               Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  plan                   Plan                 @relation(fields: [planId], references: [id])
+  events                 SubscriptionEvent[]
+}
+
+model SubscriptionEvent {
+  id             String                @id @default(uuid()) @db.Uuid
+  subscriptionId String                @db.Uuid
+  type           SubscriptionEventType
+  data           Json?
+  createdAt      DateTime              @default(now())
+  subscription   Subscription          @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+}
+
+enum SubscriptionEventType {
+  CREATED
+  RENEWED
+  CHANGED_PLAN
+  PAYMENT_FAILED
+  PAYMENT_RECOVERED
+  TRIAL_STARTED
+  TRIAL_ENDED
+  CANCELED
+  EXPIRED
+}
+
+model BusinessRole {
+  id             String         @id @default(uuid()) @db.Uuid
+  name           String         @unique
+  description    String?
+  permissions    String[]
+  active         Boolean        @default(true)
+  userBusinesses UserBusiness[]
+  createdAt      DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime       @updatedAt
+  deletedAt      DateTime?
+}
+
+model Profile {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @unique @db.Uuid
+  user         User      @relation(fields: [userId], references: [id])
+  fullName     String
+  avatarUrl    String?
+  phone        String?
+  birthDate    DateTime?
+  referralCode String?   @unique
+  addressId    String?   @db.Uuid
+  address      Address?  @relation(fields: [addressId], references: [id])
+  createdAt    DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+}
+
+model UserPreferences {
+  id                String    @id @default(uuid()) @db.Uuid
+  userId            String    @unique @db.Uuid
+  defaultBusinessId String?   @db.Uuid
+  language          String?
+  currency          String?
+  timezone          String?
+  theme             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  defaultBusiness   Business? @relation(fields: [defaultBusinessId], references: [id], onDelete: SetNull)
+}
+
+model Address {
+  id           String     @id @default(uuid()) @db.Uuid
+  street       String
+  number       String
+  complement   String?
+  neighborhood String
+  city         String
+  state        String
+  zipCode      String
+  country      String     @default("Brasil")
+  profiles     Profile[]
+  businesses   Business[]
+  customers    Customer[]
+  deletedAt    DateTime?
+  createdAt    DateTime   @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime   @updatedAt
+}
+
+model EmailVerification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  token     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model PasswordReset {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model UserBusiness {
+  id                        String                    @id @default(uuid()) @db.Uuid
+  userId                    String                    @db.Uuid
+  businessId                String                    @db.Uuid
+  status                    UserBusinessStatus        @default(PENDING)
+  businessRoleId            String                    @db.Uuid
+  createdAt                 DateTime                  @default(now()) @db.Timestamp(6)
+  updatedAt                 DateTime                  @updatedAt
+  user                      User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business                  Business                  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  role                      BusinessRole              @relation(fields: [businessRoleId], references: [id])
+  appointments              Appointment[]             @relation("ProfessionalAppointments")
+  commissionPayments        CommissionPayment[]       @relation("ProfessionalCommissionPayments")
+  waitListEntries           WaitList[]                @relation("ProfessionalWaitList")
+  workingHours              WorkingHour[]             @relation("UserWorkingHours")
+  workingHourExceptions     WorkingHourException[]    @relation("UserWorkingHourExceptions")
+  appointmentAvailabilities AppointmentAvailability[] @relation("UserAppointmentAvailability")
+  anamneseAnswersFilled     AnamneseAnswer[]          @relation("FilledByProfessional")
+  commission                Commission?
+  cashAdvances              CashAdvance[]
+  Credit                    Credit[]
+  CreditTransaction         CreditTransaction[]
+  ProductCategory           ProductCategory[]
+  ProductSupplier           ProductSupplier[]
+  createdProductCategories  ProductCategory[]         @relation("CreatedProductCategories")
+  updatedProductCategories  ProductCategory[]         @relation("UpdatedProductCategories")
+  createdProductSuppliers   ProductSupplier[]         @relation("CreatedProductSuppliers")
+  updatedProductSuppliers   ProductSupplier[]         @relation("UpdatedProductSuppliers")
+
+  @@unique([userId, businessId], map: "user_business_unique_constraint")
+  @@unique([userId, businessId], name: "UserBusinessUnique")
+  @@index([businessRoleId])
+}
+
+model SocialLink {
+  id         String    @id @default(uuid()) @db.Uuid
+  businessId String    @db.Uuid
+  platform   String
+  url        String
+  createdAt  DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime? @db.Timestamp(6)
+  business   Business  @relation(fields: [businessId], references: [id])
+
+  @@index([businessId])
+}
+
+enum BusinessStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum EntityType {
+  PERSON
+  CORPORATION
+}
+
+enum UserBusinessStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model Business {
+  id                        String                    @id @default(uuid()) @db.Uuid
+  entityType                EntityType
+  displayName               String
+  cpf                       String?
+  cnpj                      String?
+  legalName                 String?
+  tradeName                 String?
+  email                     String
+  phone                     String?
+  logo                      String?
+  description               String?
+  status                    BusinessStatus            @default(ACTIVE)
+  addressId                 String?                   @db.Uuid
+  createdAt                 DateTime                  @default(now()) @db.Timestamp(6)
+  updatedAt                 DateTime                  @updatedAt
+  deletedAt                 DateTime?                 @db.Timestamp(6)
+  address                   Address?                  @relation(fields: [addressId], references: [id])
+  userBusinesses            UserBusiness[]
+  appointments              Appointment[]
+  services                  Service[]
+  products                  Product[]
+  productPurchases          ProductPurchase[]
+  financialRecords          FinancialRecord[]
+  auditLogs                 AuditLog[]
+  servicePackages           ServicePackage[]
+  notificationTemplates     NotificationTemplate[]
+  customers                 Customer[]
+  appointmentAvailabilities AppointmentAvailability[]
+  workingHours              WorkingHour[]
+  workingHourExceptions     WorkingHourException[]
+  waitLists                 WaitList[]
+  socialLinks               SocialLink[]
+  anamneseForms             AnamneseForm[]
+  settings                  BusinessSetting[]
+  pageBio                   BusinessPageBio?
+  subscription              Subscription?
+  defaultForUsers           UserPreferences[]
+  Credit                    Credit[]
+
+  @@index([email])
+  @@index([status])
+  @@index([addressId])
+}
+
+model BusinessPageBio {
+  id                        String   @id @default(uuid()) @db.Uuid
+  businessId                String   @unique @db.Uuid
+  slug                      String   @unique
+  name                      String
+  headerText                String?
+  avatarUrl                 String?
+  backgroundColorId         String?  @db.Uuid
+  borderColorId             String?  @db.Uuid
+  locale                    String
+  onlineSchedulingAvailable Boolean
+  onlineSchedulingSlug      String?
+  createdAt                 DateTime @default(now()) @db.Timestamp(6)
+  updatedAt                 DateTime @updatedAt @db.Timestamp(6)
+  business                  Business @relation(fields: [businessId], references: [id])
+  backgroundColor           Color?   @relation("PageBioBackgroundColor", fields: [backgroundColorId], references: [id])
+  borderColor               Color?   @relation("PageBioBorderColor", fields: [borderColorId], references: [id])
+
+  @@index([businessId])
+  @@index([slug])
+  @@index([backgroundColorId])
+  @@index([borderColorId])
+}
+
+model Color {
+  id                 String            @id @default(uuid()) @db.Uuid
+  name               String
+  hexCode            String
+  createdAt          DateTime          @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime          @updatedAt
+  deletedAt          DateTime?
+  services           Service[]
+  pageBioBackgrounds BusinessPageBio[] @relation("PageBioBackgroundColor")
+  pageBioBorders     BusinessPageBio[] @relation("PageBioBorderColor")
+
+  @@index([name])
+}
+
+model Customer {
+  id                  String               @id @default(uuid()) @db.Uuid
+  businessId          String               @db.Uuid
+  customerType        EntityType
+  displayName         String
+  legalName           String?
+  tradeName           String?
+  phone               String?
+  whatsapp            String?
+  addressId           String?              @db.Uuid
+  cpf                 String?
+  cnpj                String?
+  birthDate           DateTime?
+  email               String?
+  deletedAt           DateTime?            @db.Timestamp(6)
+  createdAt           DateTime             @default(now()) @db.Timestamp(6)
+  updatedAt           DateTime             @updatedAt
+  business            Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  address             Address?             @relation(fields: [addressId], references: [id])
+  appointments        Appointment[]
+  waitLists           WaitList[]
+  notes               CustomerNote[]
+  anamnesisSignatures AnamnesisSignature[]
+  FinancialRecord     FinancialRecord[]
+  Credit              Credit[]
+
+  @@index([addressId])
+}
+
+model CustomerNote {
+  id          String    @id @default(uuid()) @db.Uuid
+  customerId  String    @db.Uuid
+  description String
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime? @db.Timestamp(6)
+  customer    Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+}
+
+model AnamnesisSignature {
+  id             String       @id @default(uuid()) @db.Uuid
+  customerId     String       @db.Uuid
+  anamneseFormId String       @db.Uuid
+  signedAt       DateTime     @default(now()) @db.Timestamp(6)
+  signatureData  Json?
+  createdAt      DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?    @db.Timestamp(6)
+  customer       Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  anamneseForm   AnamneseForm @relation(fields: [anamneseFormId], references: [id])
+
+  @@index([customerId])
+  @@index([anamneseFormId])
+}
+
+model Appointment {
+  id                String              @id @default(uuid()) @db.Uuid
+  businessId        String              @db.Uuid
+  userBusinessId    String              @db.Uuid
+  customerId        String              @db.Uuid
+  serviceId         String              @db.Uuid
+  date              DateTime            @db.Date
+  startTime         DateTime            @db.Time(6)
+  start             DateTime            @db.Timestamp(6)
+  business          Business            @relation(fields: [businessId], references: [id])
+  customer          Customer            @relation(fields: [customerId], references: [id])
+  professional      UserBusiness        @relation("ProfessionalAppointments", fields: [userBusinessId], references: [id])
+  service           Service             @relation(fields: [serviceId], references: [id])
+  FinancialRecord   FinancialRecord[]
+  CreditTransaction CreditTransaction[]
+
+  @@index([businessId])
+  @@index([customerId])
+  @@index([userBusinessId])
+  @@index([serviceId])
+  @@index([start])
+}
+
+model AppointmentRepeatInfo {
+  id                  String    @id @default(uuid()) @db.Uuid
+  appointmentId       String    @db.Uuid
+  repeatStyle         String
+  repeatInterval      Int
+  numberOfOccurrences Int
+  endDate             DateTime?
+  daysOfWeek          Json?
+  createdAt           DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt           DateTime  @updatedAt
+}
+
+model AppointmentAvailability {
+  id             String       @id @default(uuid()) @db.Uuid
+  date           DateTime     @db.Date
+  startTime      DateTime     @db.Time(6)
+  endTime        DateTime     @db.Time(6)
+  userBusinessId String       @db.Uuid
+  businessId     String       @db.Uuid
+  createdAt      DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime     @updatedAt
+  userBusiness   UserBusiness @relation("UserAppointmentAvailability", fields: [userBusinessId], references: [id])
+  business       Business     @relation(fields: [businessId], references: [id])
+}
+
+model WorkingHour {
+  id             String       @id @default(uuid()) @db.Uuid
+  businessId     String       @db.Uuid
+  userBusinessId String       @db.Uuid
+  dayOfWeek      Int
+  startTime      String
+  endTime        String
+  createdAt      DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?    @db.Timestamp(6)
+  business       Business     @relation(fields: [businessId], references: [id])
+  professional   UserBusiness @relation("UserWorkingHours", fields: [userBusinessId], references: [id])
+
+  @@index([businessId])
+  @@index([userBusinessId])
+}
+
+model WorkingHourException {
+  id             String       @id @default(uuid()) @db.Uuid
+  businessId     String       @db.Uuid
+  userBusinessId String       @db.Uuid
+  date           DateTime     @db.Date
+  startTime      String?
+  endTime        String?
+  isWorking      Boolean
+  description    String?
+  createdAt      DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?    @db.Timestamp(6)
+  business       Business     @relation(fields: [businessId], references: [id])
+  professional   UserBusiness @relation("UserWorkingHourExceptions", fields: [userBusinessId], references: [id])
+
+  @@index([businessId])
+  @@index([userBusinessId])
+  @@index([date])
+}
+
+model Influencer {
+  id            String                 @id @default(uuid()) @db.Uuid
+  userId        String                 @unique @db.Uuid
+  bio           String?                @db.Text
+  website       String?
+  active        Boolean                @default(true)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commissions   InfluencerCommission[]
+  referralCodes ReferralCode[]
+}
+
+model InfluencerCommission {
+  id           String     @id @default(uuid()) @db.Uuid
+  influencerId String     @db.Uuid
+  percentage   Decimal    @db.Decimal(5, 2)
+  startDate    DateTime
+  endDate      DateTime?
+  active       Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  influencer   Influencer @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+}
+
+model ReferralCode {
+  id           String     @id @default(uuid()) @db.Uuid
+  code         String     @unique
+  influencerId String     @db.Uuid
+  expiresAt    DateTime?
+  active       Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  influencer   Influencer @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+}
+
+model Service {
+  id                           String               @id @default(uuid()) @db.Uuid
+  businessId                   String               @db.Uuid
+  createdById                  String               @db.Uuid
+  updatedById                  String               @db.Uuid
+  name                         String
+  duration                     Int
+  price                        Decimal              @db.Decimal(10, 2)
+  priceCost                    Decimal?             @db.Decimal(10, 2)
+  colorId                      String?              @db.Uuid
+  serviceCategoryId            String?              @db.Uuid
+  description                  String?
+  promoPriceDescription        String?
+  imageUrl                     String?
+  onlineSchedulingEnabled      Boolean              @default(true)
+  onlineSchedulingPriceDisplay String               @default("show")
+  active                       Boolean              @default(true)
+  deletedAt                    DateTime?            @db.Timestamp(6)
+  createdAt                    DateTime             @default(now()) @db.Timestamp(6)
+  updatedAt                    DateTime             @updatedAt
+  business                     Business             @relation(fields: [businessId], references: [id])
+  color                        Color?               @relation(fields: [colorId], references: [id])
+  appointments                 Appointment[]
+  servicePackageItems          ServicePackageItem[]
+  waitLists                    WaitList[]
+
+  @@index([businessId])
+  @@index([colorId])
+  @@index([name])
+}
+
+model ServiceCategory {
+  id          String    @id @default(uuid()) @db.Uuid
+  businessId  String    @db.Uuid
+  createdById String    @db.Uuid
+  updatedById String    @db.Uuid
+  name        String
+  deletedAt   DateTime? @db.Timestamp(6)
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime  @updatedAt
+}
+
+model CompanyOnlineSchedulingSetting {
+  id                           String  @id @default(uuid()) @db.Uuid
+  businessId                   String  @db.Uuid
+  serviceId                    String  @db.Uuid
+  onlineSchedulingEnabled      Boolean
+  onlineSchedulingPriceDisplay String
+}
+
+model ServicePackage {
+  id          String               @id @default(uuid()) @db.Uuid
+  businessId  String               @db.Uuid
+  name        String
+  description String?
+  price       Decimal              @db.Decimal(10, 2)
+  createdAt   DateTime             @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime             @updatedAt
+  deletedAt   DateTime?
+  business    Business             @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  items       ServicePackageItem[]
+
+  @@index([businessId])
+  @@index([name])
+}
+
+model ServicePackageItem {
+  id               String         @id @default(uuid()) @db.Uuid
+  servicePackageId String         @db.Uuid
+  serviceId        String         @db.Uuid
+  quantity         Int
+  createdAt        DateTime       @default(now()) @db.Timestamp(6)
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+  servicePackage   ServicePackage @relation(fields: [servicePackageId], references: [id])
+  service          Service        @relation(fields: [serviceId], references: [id])
+
+  @@index([servicePackageId])
+  @@index([serviceId])
+}
+
+model ServicePackageUsage {
+  id               String   @id @default(uuid()) @db.Uuid
+  servicePackageId String   @db.Uuid
+  customerId       String   @db.Uuid
+  serviceId        String   @db.Uuid
+  appointmentId    String?  @db.Uuid
+  usedAt           DateTime @default(now()) @db.Timestamp(6)
+}
+
+model Product {
+  id                 String                @id @default(uuid()) @db.Uuid
+  businessId         String                @db.Uuid
+  createdById        String                @db.Uuid
+  updatedById        String                @db.Uuid
+  name               String
+  salePrice          Decimal               @db.Decimal(10, 2)
+  productCategoryId  String                @db.Uuid
+  desiredStockAmount Int
+  imageUrl           String?
+  description        String?
+  price              Decimal               @db.Decimal(10, 2)
+  stock              Int                   @default(0)
+  active             Boolean               @default(true)
+  deletedAt          DateTime?             @db.Timestamp(6)
+  createdAt          DateTime              @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime              @updatedAt
+  business           Business              @relation(fields: [businessId], references: [id])
+  category           ProductCategory       @relation(fields: [productCategoryId], references: [id])
+  purchaseItems      ProductPurchaseItem[]
+
+  @@index([businessId])
+  @@index([name])
+}
+
+model ProductCategory {
+  id             String        @id @default(uuid()) @db.Uuid
+  businessId     String        @db.Uuid
+  createdById    String        @db.Uuid
+  updatedById    String        @db.Uuid
+  name           String
+  deletedAt      DateTime?     @db.Timestamp(6)
+  createdAt      DateTime      @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime      @updatedAt
+  products       Product[]
+  createdBy      UserBusiness  @relation("CreatedProductCategories", fields: [createdById], references: [id])
+  updatedBy      UserBusiness  @relation("UpdatedProductCategories", fields: [updatedById], references: [id])
+  UserBusiness   UserBusiness? @relation(fields: [userBusinessId], references: [id])
+  userBusinessId String?       @db.Uuid
+
+  @@index([createdById])
+  @@index([updatedById])
+}
+
+model ProductSupplier {
+  id             String            @id @default(uuid()) @db.Uuid
+  businessId     String            @db.Uuid
+  createdById    String            @db.Uuid
+  updatedById    String            @db.Uuid
+  name           String
+  deletedAt      DateTime?         @db.Timestamp(6)
+  createdAt      DateTime          @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime          @updatedAt
+  purchases      ProductPurchase[]
+  createdBy      UserBusiness      @relation("CreatedProductSuppliers", fields: [createdById], references: [id])
+  updatedBy      UserBusiness      @relation("UpdatedProductSuppliers", fields: [updatedById], references: [id])
+  UserBusiness   UserBusiness?     @relation(fields: [userBusinessId], references: [id])
+  userBusinessId String?           @db.Uuid
+
+  @@index([createdById])
+  @@index([updatedById])
+}
+
+model ProductStockMovement {
+  id           String   @id @default(uuid()) @db.Uuid
+  productId    String   @db.Uuid
+  quantity     Int
+  description  String
+  date         DateTime @db.Date
+  movementType String
+  createdAt    DateTime @default(now()) @db.Timestamp(6)
+}
+
+model ProductStock {
+  id           String   @id @default(uuid()) @db.Uuid
+  productId    String   @db.Uuid
+  businessId   String   @db.Uuid
+  currentStock Int      @default(0)
+  createdAt    DateTime @default(now()) @db.Timestamp(6)
+  updatedAt    DateTime @updatedAt
+}
+
+model ProductSale {
+  id                   String              @id @default(uuid()) @db.Uuid
+  businessId           String              @db.Uuid
+  customerId           String              @db.Uuid
+  saleDate             DateTime            @db.Date
+  comments             String?
+  discount             Float
+  discountInPercentage Boolean
+  createdById          String              @db.Uuid
+  updatedById          String              @db.Uuid
+  createdAt            DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt            DateTime            @updatedAt
+  CreditTransaction    CreditTransaction[]
+}
+
+model ProductSaleItem {
+  id            String   @id @default(uuid()) @db.Uuid
+  productSaleId String   @db.Uuid
+  productId     String   @db.Uuid
+  quantity      Int
+  value         Decimal  @db.Decimal(10, 2)
+  createdAt     DateTime @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime @updatedAt
+}
+
+model ProductPurchase {
+  id                String                @id @default(uuid()) @db.Uuid
+  businessId        String                @db.Uuid
+  productSupplierId String                @db.Uuid
+  description       String?
+  purchaseDate      DateTime              @db.Date
+  value             Decimal               @db.Decimal(10, 2)
+  paymentMethod     String
+  installmentTotal  Int?
+  expenseId         String?               @db.Uuid
+  deletedAt         DateTime?             @db.Timestamp(6)
+  createdById       String                @db.Uuid
+  updatedById       String                @db.Uuid
+  createdAt         DateTime              @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime              @updatedAt
+  items             ProductPurchaseItem[]
+  supplier          ProductSupplier       @relation(fields: [productSupplierId], references: [id])
+  business          Business              @relation(fields: [businessId], references: [id])
+}
+
+model ProductPurchaseItem {
+  id                String          @id @default(uuid()) @db.Uuid
+  productPurchaseId String          @db.Uuid
+  productId         String          @db.Uuid
+  quantity          Int
+  unitPrice         Decimal         @db.Decimal(10, 2)
+  totalPrice        Decimal         @db.Decimal(10, 2)
+  createdAt         DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime        @updatedAt
+  purchase          ProductPurchase @relation(fields: [productPurchaseId], references: [id])
+  product           Product         @relation(fields: [productId], references: [id])
+}
+
+model AccountsReceivable {
+  id                          String    @id @default(uuid()) @db.Uuid
+  businessId                  String    @db.Uuid
+  customerId                  String    @db.Uuid
+  date                        DateTime  @db.Date
+  totalBeforeDiscount         Decimal   @db.Decimal(10, 2)
+  total                       Decimal   @db.Decimal(10, 2)
+  totalPaid                   Decimal   @db.Decimal(10, 2)
+  opened                      Boolean
+  comments                    String?
+  numberOfAppointmentsAllowed Int
+  type                        String
+  discount                    Decimal   @db.Decimal(10, 2)
+  discountInPercentage        Boolean
+  commissionDone              Boolean
+  createdById                 String    @db.Uuid
+  updatedById                 String    @db.Uuid
+  createdAt                   DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt                   DateTime  @updatedAt
+  deletedAt                   DateTime? @db.Timestamp(6)
+}
+
+model AccountsReceivableItem {
+  id                   String    @id @default(uuid()) @db.Uuid
+  accountsReceivableId String    @db.Uuid
+  serviceId            String?   @db.Uuid
+  servicePackageId     String?   @db.Uuid
+  quantity             Int
+  price                Decimal   @db.Decimal(10, 2)
+  createdById          String    @db.Uuid
+  updatedById          String    @db.Uuid
+  createdAt            DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt            DateTime  @updatedAt
+  deletedAt            DateTime? @db.Timestamp(6)
+}
+
+model AccountsReceivablePayment {
+  id                   String    @id @default(uuid()) @db.Uuid
+  accountsReceivableId String    @db.Uuid
+  value                Float
+  installmentTotal     Int?
+  paymentMethod        String
+  cardFlag             String?
+  dueDate              DateTime
+  createdById          String    @db.Uuid
+  updatedById          String    @db.Uuid
+  createdAt            DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt            DateTime  @updatedAt
+  deletedAt            DateTime? @db.Timestamp(6)
+}
+
+model Payment {
+  id                   String    @id @default(uuid()) @db.Uuid
+  appointmentId        String?   @db.Uuid
+  accountsReceivableId String?   @db.Uuid
+  value                Decimal   @db.Decimal(10, 2)
+  paymentMethod        String
+  dueDate              DateTime
+  automatic            Boolean
+  installmentNumber    Int?
+  installmentTotal     Int?
+  parentPaymentId      String?   @db.Uuid
+  expenseId            String?   @db.Uuid
+  customerCreditId     String?   @db.Uuid
+  cardFlag             String?
+  createdById          String    @db.Uuid
+  updatedById          String    @db.Uuid
+  createdAt            DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt            DateTime  @updatedAt
+  deletedAt            DateTime? @db.Timestamp(6)
+}
+
+model PaymentSummary {
+  appointmentId    String  @db.Uuid
+  price            Decimal @db.Decimal(10, 2)
+  nonPaid          Boolean
+  totalPaid        Decimal @db.Decimal(10, 2)
+  automaticPayment Boolean
+  totalOwned       Decimal @db.Decimal(10, 2)
+
+  @@id([appointmentId])
+}
+
+model CommissionPayment {
+  id             String       @id @default(uuid()) @db.Uuid
+  userBusinessId String       @db.Uuid
+  amount         Decimal      @db.Decimal(10, 2)
+  status         String       @default("PENDING")
+  notes          String?
+  paidAt         DateTime?
+  createdAt      DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?
+  professional   UserBusiness @relation("ProfessionalCommissionPayments", fields: [userBusinessId], references: [id])
+
+  @@index([userBusinessId])
+  @@index([status])
+}
+
+model Commission {
+  id             String       @id @default(uuid()) @db.Uuid
+  userBusinessId String       @unique @db.Uuid
+  percentage     Decimal      @db.Decimal(5, 2)
+  createdAt      DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime     @updatedAt
+  professional   UserBusiness @relation(fields: [userBusinessId], references: [id], onDelete: Cascade)
+}
+
+enum CashAdvanceStatus {
+  PENDING
+  PAID
+  CANCELED
+}
+
+model CashAdvance {
+  id             String            @id @default(uuid()) @db.Uuid
+  userBusinessId String            @db.Uuid
+  amount         Decimal           @db.Decimal(10, 2)
+  issueDate      DateTime          @db.Date
+  description    String?
+  status         CashAdvanceStatus @default(PENDING)
+  paidAt         DateTime?
+  notes          String?
+  createdAt      DateTime          @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime          @updatedAt
+  deletedAt      DateTime?
+  professional   UserBusiness      @relation(fields: [userBusinessId], references: [id], onDelete: Cascade)
+
+  @@index([userBusinessId])
+  @@index([status])
+  @@index([issueDate])
+}
+
+model WaitList {
+  id             String       @id @default(uuid()) @db.Uuid
+  businessId     String       @db.Uuid
+  customerId     String       @db.Uuid
+  userBusinessId String       @db.Uuid
+  serviceId      String       @db.Uuid
+  requestedDate  DateTime     @db.Timestamp(6)
+  notes          String?
+  createdAt      DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?    @db.Timestamp(6)
+  business       Business     @relation(fields: [businessId], references: [id])
+  customer       Customer     @relation(fields: [customerId], references: [id])
+  professional   UserBusiness @relation("ProfessionalWaitList", fields: [userBusinessId], references: [id])
+  service        Service      @relation(fields: [serviceId], references: [id])
+
+  @@index([businessId])
+  @@index([customerId])
+  @@index([userBusinessId])
+  @@index([serviceId])
+}
+
+model Expense {
+  id                       String    @id @default(uuid()) @db.Uuid
+  businessId               String    @db.Uuid
+  name                     String
+  value                    Decimal   @db.Decimal(10, 2)
+  date                     DateTime  @db.Date
+  category                 String
+  expenseCategoryId        String?   @db.Uuid
+  type                     String
+  startDate                DateTime?
+  endDate                  DateTime?
+  installmentNumber        Int?
+  installmentTotal         Int?
+  totalValue               Decimal?  @db.Decimal(10, 2)
+  parentExpenseId          String?   @db.Uuid
+  paid                     Boolean
+  attachmentSourceType     String?
+  attachmentSourceObjectId String?
+  deletedAt                DateTime? @db.Timestamp(6)
+  deletedById              String?   @db.Uuid
+  createdById              String    @db.Uuid
+  updatedById              String    @db.Uuid
+  createdAt                DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt                DateTime  @updatedAt
+}
+
+model ExpenseCategory {
+  id                String    @id @default(uuid()) @db.Uuid
+  businessId        String    @db.Uuid
+  name              String
+  description       String?
+  categoryGroupId   String?   @db.Uuid
+  categoryGroupName String?
+  deletedAt         DateTime? @db.Timestamp(6)
+  deletedById       String?   @db.Uuid
+  createdById       String    @db.Uuid
+  updatedById       String    @db.Uuid
+  createdAt         DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime  @updatedAt
+}
+
+model PredefinedMessage {
+  id          String    @id @default(uuid()) @db.Uuid
+  businessId  String    @db.Uuid
+  userId      String    @db.Uuid
+  name        String
+  text        String
+  deletedAt   DateTime? @db.Timestamp(6)
+  deletedById String?   @db.Uuid
+  createdById String    @db.Uuid
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  updatedById String    @db.Uuid
+  updatedAt   DateTime  @updatedAt
+}
+
+model AnamneseForm {
+  id          String               @id @default(uuid()) @db.Uuid
+  businessId  String               @db.Uuid
+  name        String
+  description String?
+  terms       String?
+  deletedAt   DateTime?            @db.Timestamp(6)
+  deletedById String?              @db.Uuid
+  createdById String               @db.Uuid
+  updatedById String               @db.Uuid
+  createdAt   DateTime             @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime             @updatedAt
+  business    Business             @relation(fields: [businessId], references: [id])
+  questions   AnamneseQuestion[]
+  answers     AnamneseAnswer[]
+  signatures  AnamnesisSignature[]
+}
+
+model AnamneseAnswer {
+  id                   String                  @id @default(uuid()) @db.Uuid
+  anamneseFormId       String                  @db.Uuid
+  businessId           String                  @db.Uuid
+  customerId           String                  @db.Uuid
+  filledById           String?                 @db.Uuid
+  date                 DateTime                @db.Date
+  comments             String?
+  signedAt             DateTime?
+  signedLocalFilePath  String?
+  signedDeviceInfo     String?
+  signedDeviceModel    String?
+  signedPlatform       String?
+  createdById          String                  @db.Uuid
+  updatedById          String                  @db.Uuid
+  createdAt            DateTime                @default(now()) @db.Timestamp(6)
+  updatedAt            DateTime                @updatedAt
+  answersDetails       AnamneseAnswersDetail[]
+  AnamneseForm         AnamneseForm            @relation(fields: [anamneseFormId], references: [id])
+  filledByProfessional UserBusiness?           @relation("FilledByProfessional", fields: [filledById], references: [id])
+}
+
+model AnamneseQuestion {
+  id                 String                  @id @default(uuid()) @db.Uuid
+  anamneseFormId     String                  @db.Uuid
+  title              String
+  sectionTitle       String?
+  questionType       String
+  booleanWithDetails Boolean?
+  required           Boolean
+  otherItemId        String?                 @db.Uuid
+  section            Boolean
+  deletedAt          DateTime?               @db.Timestamp(6)
+  deletedById        String?                 @db.Uuid
+  createdById        String                  @db.Uuid
+  updatedById        String                  @db.Uuid
+  createdAt          DateTime                @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime                @updatedAt
+  questionItems      AnamneseQuestionItem[]
+  answersDetails     AnamneseAnswersDetail[]
+  AnamneseForm       AnamneseForm            @relation(fields: [anamneseFormId], references: [id])
+}
+
+model AnamneseAnswersDetail {
+  id                      String           @id @default(uuid()) @db.Uuid
+  anamneseAnswerId        String           @db.Uuid
+  anamneseQuestionId      String           @db.Uuid
+  booleanAnswer           Boolean?
+  textAnswer              String?
+  anamneseQuestionItemIds String[]
+  createdById             String           @db.Uuid
+  updatedById             String           @db.Uuid
+  createdAt               DateTime         @default(now()) @db.Timestamp(6)
+  updatedAt               DateTime         @updatedAt
+  AnamneseAnswer          AnamneseAnswer   @relation(fields: [anamneseAnswerId], references: [id])
+  AnamneseQuestion        AnamneseQuestion @relation(fields: [anamneseQuestionId], references: [id])
+}
+
+model AnamneseQuestionItem {
+  id                 String           @id @default(uuid()) @db.Uuid
+  anamneseQuestionId String           @db.Uuid
+  label              String
+  deletedAt          DateTime?        @db.Timestamp(6)
+  deletedById        String?          @db.Uuid
+  createdById        String           @db.Uuid
+  updatedById        String           @db.Uuid
+  createdAt          DateTime         @default(now()) @db.Timestamp(6)
+  updatedAt          DateTime         @updatedAt
+  AnamneseQuestion   AnamneseQuestion @relation(fields: [anamneseQuestionId], references: [id])
+}
+
+model SystemLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  type      String
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id         String    @id @default(uuid()) @db.Uuid
+  businessId String?   @db.Uuid
+  userId     String    @db.Uuid
+  action     String
+  entityType String
+  entityId   String
+  details    Json?
+  createdAt  DateTime  @default(now()) @db.Timestamp(6)
+  business   Business? @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id])
+
+  @@index([businessId])
+  @@index([userId])
+  @@index([action])
+  @@index([entityType])
+  @@index([entityId])
+  @@index([createdAt])
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  ERROR
+  SUCCESS
+}
+
+model Notification {
+  id          String           @id @default(uuid()) @db.Uuid
+  type        NotificationType
+  title       String
+  message     String
+  recipientId String           @db.Uuid
+  read        Boolean          @default(false)
+  createdAt   DateTime         @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime         @updatedAt
+}
+
+model NotificationTemplate {
+  id         String           @id @default(uuid()) @db.Uuid
+  businessId String           @db.Uuid
+  type       NotificationType
+  title      String
+  message    String
+  variables  String[]
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  deletedAt  DateTime?
+  business   Business         @relation(fields: [businessId], references: [id])
+
+  @@index([businessId])
+}
+
+model SystemSetting {
+  id          String   @id @default(uuid()) @db.Uuid
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @updatedAt
+}
+
+model BusinessSetting {
+  id          String   @id @default(uuid()) @db.Uuid
+  businessId  String   @db.Uuid
+  key         String
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, key])
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_TRANSFER
+  PIX
+  OTHER
+}
+
+model FinancialRecord {
+  id              String         @id @default(uuid()) @db.Uuid
+  businessId      String         @db.Uuid
+  type            String
+  amount          Decimal        @db.Decimal(10, 2)
+  description     String
+  transactionDate DateTime       @db.Date
+  category        String?
+  paymentMethod   PaymentMethod? @default(OTHER)
+  observations    String?
+  customerId      String?        @db.Uuid
+  appointmentId   String?        @db.Uuid
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  business        Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  customer        Customer?      @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  appointment     Appointment?   @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  @@index([businessId])
+  @@index([type])
+  @@index([transactionDate])
+  @@index([customerId])
+  @@index([appointmentId])
+}
+
+model Referral {
+  id         String   @id @default(uuid()) @db.Uuid
+  referrerId String   @db.Uuid
+  referredId String   @unique @db.Uuid
+  createdAt  DateTime @default(now())
+  referrer   User     @relation("UserMadeReferrals", fields: [referrerId], references: [id], onDelete: Cascade)
+  referred   User     @relation("UserWasReferred", fields: [referredId], references: [id], onDelete: Cascade)
+
+  @@index([referrerId])
+  @@index([referredId])
+}
+
+enum CreditStatus {
+  AVAILABLE
+  DEPLETED
+  EXPIRED
+  CANCELLED
+}
+
+enum CreditTransactionType {
+  GRANT
+  REDEMPTION
+  EXPIRATION
+  CANCELLATION
+  ADJUSTMENT
+}
+
+model Credit {
+  id            String              @id @default(uuid()) @db.Uuid
+  businessId    String              @db.Uuid
+  business      Business            @relation(fields: [businessId], references: [id])
+  customerId    String              @db.Uuid
+  customer      Customer            @relation(fields: [customerId], references: [id])
+  initialAmount Float
+  balance       Float
+  status        CreditStatus
+  notes         String?
+  expiresAt     DateTime?
+  transactions  CreditTransaction[]
+  createdBy     String              @db.Uuid
+  createdByUser UserBusiness        @relation(fields: [createdBy], references: [id])
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@index([businessId])
+  @@index([customerId])
+}
+
+model CreditTransaction {
+  id              String                @id @default(uuid()) @db.Uuid
+  creditId        String                @db.Uuid
+  credit          Credit                @relation(fields: [creditId], references: [id])
+  type            CreditTransactionType
+  amount          Float
+  balanceBefore   Float
+  balanceAfter    Float
+  notes           String?
+  appointmentId   String?               @db.Uuid
+  appointment     Appointment?          @relation(fields: [appointmentId], references: [id])
+  productSaleId   String?               @db.Uuid
+  productSale     ProductSale?          @relation(fields: [productSaleId], references: [id])
+  processedBy     String                @db.Uuid
+  processedByUser UserBusiness          @relation(fields: [processedBy], references: [id])
+  createdAt       DateTime              @default(now())
+
+  @@index([creditId])
+  @@index([appointmentId])
+  @@index([productSaleId])
+}
+
+model ReminderList {
+  id           String         @id @default(uuid()) @db.Uuid
+  userId       String         @db.Uuid
+  title        String
+  description  String?
+  color        String
+  priority     Int?           @default(1)
+  displayOrder Int            @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items        ReminderItem[]
+
+  @@index([userId])
+}
+
+enum ReminderItemPriority {
+  NONE
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model ReminderItem {
+  id           String               @id @default(uuid()) @db.Uuid
+  listId       String               @db.Uuid
+  userId       String               @db.Uuid
+  title        String
+  notes        String?
+  isCompleted  Boolean              @default(false)
+  dueDate      DateTime?
+  isAllDay     Boolean              @default(false)
+  priority     ReminderItemPriority @default(NONE)
+  location     String?
+  displayOrder Int                  @default(0)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  list         ReminderList         @relation(fields: [listId], references: [id], onDelete: Cascade)
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([listId])
+  @@index([userId])
+}
+
+model Document {
+  id          String    @id @default(uuid()) @db.Uuid
+  type        String    @unique
+  title       String
+  content     String    @db.Text
+  version     Int       @default(1)
+  isActive    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+}
